@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Solution to exercises for Part1
 
 # Exercise 1.1: course information, step1
@@ -731,7 +731,3 @@ const App = () => {
 
 export default App
 ```
-=======
-# fullstackopen_Course
-This course serves as an introduction to modern web application development with JavaScript. The main focus is on building single page applications with ReactJS that use REST APIs built with Node.js. The course also contains a section on GraphQL, a modern alternative to REST APIs.
->>>>>>> bfa77b647f328c87432e866abcd1985e4d9353c6
