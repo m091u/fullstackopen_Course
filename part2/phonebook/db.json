@@ -2,7 +2,7 @@
   "persons": [
     {
       "name": "Arto Hellas",
-      "number": "040-123456",
+      "number": "090-123456",
       "id": "1"
     },
     {
@@ -29,6 +29,16 @@
       "id": "088b",
       "name": "Bob Marley",
       "number": "3900 679"
+    },
+    {
+      "id": "70b5",
+      "name": "John Doe",
+      "number": "049-835-3987"
+    },
+    {
+      "id": "d54f",
+      "name": "George Black",
+      "number": "345-986-234"
     }
   ]
 }

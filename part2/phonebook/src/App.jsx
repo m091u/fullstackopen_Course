@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import Search from "./components/Search";
 import Form from "./components/Form";
-import Person from "./components/Person";
 import PersonsList from "./components/PersonsList";
+import personServices from "./services/person";
+import person from "./services/person";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -13,16 +13,11 @@ const App = () => {
   const [char, setChar] = useState("");
 
   useEffect(() => {
-    console.log("effect");
-    axios.get("http://localhost:3001/persons").then((response) => {
-      console.log("promise fulfiled");
-      setPersons(response.data);
-      setFilteredNames(response.data);
+    personServices.getAll().then((initialPersons) => {
+      setPersons(initialPersons);
+      setFilteredNames(initialPersons);
     });
   }, []);
-
-  console.log("render", persons.length, "notes");
-  console.log(persons);
 
   const addPerson = (event) => {
     event.preventDefault();
@@ -33,25 +28,34 @@ const App = () => {
       // id: persons.length + 1,
     };
 
-    if (
-      persons.find(
-        (person) =>
-          person.name.toLowerCase() === personObject.name.toLowerCase()
-      )
-    ) {
-      alert(`${personObject.name} is already in the phonebook`);
+    const existingPerson = persons.find((person) => person.name.toLowerCase() === personObject.name.toLowerCase()
+    );
+
+    if (existingPerson) {
+      const confirmNrUpdate = window.confirm(
+        `${personObject.name} is already added to the phonebook, replace the old number with a new one?`
+      );
+
+      if (confirmNrUpdate) {
+        personServices
+          .update(existingPerson.id, { ...existingPerson, number: newNumber })
+          .then((updatedPerson) => {
+            const updatedPersons = persons.map((person) =>
+              person.id === updatedPerson.id ? updatedPerson : person
+            );
+            setPersons(updatedPersons);
+            setFilteredNames(updatedPersons);
+          })
+          .catch((error) => console.error("Error updating person: ", error));
+      }
     } else {
-      axios
-        .post("http://localhost:3001/persons", personObject)
-        .then((response) => {
-          // setPersons((prevPersons) => [...prevPersons, personObject]);
-          // setFilteredNames((prevFilteredNames) => [
-          //   ...prevFilteredNames,
-          //   personObject,
-          // ]);
-          setPersons(persons.concat(response.data))
-          setFilteredNames(filteredNames.concat(response.data))
-        });
+      personServices
+        .create(personObject)
+        .then((createdPerson) => {
+          setPersons(persons.concat(createdPerson));
+          setFilteredNames(filteredNames.concat(createdPerson));
+        })
+        .catch((error) => console.error("Error updating person: ", error));
     }
     setNewName("");
     setNewNumber("");
@@ -83,6 +87,19 @@ const App = () => {
     searchNamesList(event.target.value);
   };
 
+  const handleDelete = (id) => {
+    const personToDelete = persons.find((p) => p.id === id);
+
+    const confirmDelete = window.confirm(`Delete ${personToDelete.name}?`);
+    if (confirmDelete) {
+      personServices.deletePerson(id).then((returnedList) => {
+        const updatedList = persons.filter((person) => person.id !== id);
+        setPersons(updatedList);
+        setFilteredNames(updatedList);
+      });
+    }
+  };
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -98,7 +115,7 @@ const App = () => {
 
       <h2>Numbers</h2>
 
-      <PersonsList filteredNames={filteredNames} />
+      <PersonsList filteredNames={filteredNames} handleDelete={handleDelete} />
     </div>
   );
 };
