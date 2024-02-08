@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
+import "./App.css";
 import Search from "./components/Search";
 import Form from "./components/Form";
 import PersonsList from "./components/PersonsList";
 import personServices from "./services/person";
-import person from "./services/person";
+import Notification from "./components/Notification";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -11,6 +12,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState("");
   const [filteredNames, setFilteredNames] = useState([]);
   const [char, setChar] = useState("");
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     personServices.getAll().then((initialPersons) => {
@@ -28,7 +30,8 @@ const App = () => {
       // id: persons.length + 1,
     };
 
-    const existingPerson = persons.find((person) => person.name.toLowerCase() === personObject.name.toLowerCase()
+    const existingPerson = persons.find(
+      (person) => person.name.toLowerCase() === personObject.name.toLowerCase()
     );
 
     if (existingPerson) {
@@ -45,8 +48,24 @@ const App = () => {
             );
             setPersons(updatedPersons);
             setFilteredNames(updatedPersons);
+            setNotification({
+              message: `Phone number for ${updatedPerson.name} was updated`,
+              isError: false,
+            });
+            setTimeout(() => {
+              setNotification(null);
+            }, 4000);
           })
-          .catch((error) => console.error("Error updating person: ", error));
+          .catch((error) => {
+            console.error("Error updating person: ", error);
+            setNotification({
+              message: `Information of ${existingPerson.name}  has already been removed from phonebook`,
+              isError: true,
+            });
+            setTimeout(() => {
+              setNotification(null);
+            }, 4000);
+          });
       }
     } else {
       personServices
@@ -54,6 +73,13 @@ const App = () => {
         .then((createdPerson) => {
           setPersons(persons.concat(createdPerson));
           setFilteredNames(filteredNames.concat(createdPerson));
+          setNotification({
+            message: `${createdPerson.name} was added to phonebook`,
+            isError: false,
+          });
+          setTimeout(() => {
+            setNotification(null);
+          }, 4000);
         })
         .catch((error) => console.error("Error updating person: ", error));
     }
@@ -103,6 +129,10 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification
+        message={notification?.message}
+        isError={notification?.isError}
+      />
       <Search handleSearch={handleSearch} char={char} />
       <h3>Add a new person</h3>
       <Form
