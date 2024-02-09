@@ -1,4 +1,4 @@
-function Search({ handleSearch, char }) {
+const Search = ({ handleSearch, char }) => {
   return (
     <>
       Filter shown with:{" "}
