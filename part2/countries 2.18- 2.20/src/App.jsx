@@ -10,7 +10,6 @@ import countriesService from "./services/countries";
 const baseUrl = "https://studies.cs.helsinki.fi/restcountries/api/all";
 const apiKey = import.meta.env.API_KEY;
 
-
 const App = () => {
   const [countries, setCountries] = useState([]);
   const [filteredCountries, setFilteredCountries] = useState([]);
@@ -32,13 +31,8 @@ const App = () => {
     const filtered = countries.filter((country) =>
       country.name.common.toLowerCase().includes(char.toLowerCase())
     );
-    
-    if (filtered.length === 1) {
-      setSelectedCountry(filtered[0]);
-    } else {
-      setSelectedCountry(null);
-    }
     setFilteredCountries(filtered);
+    setSelectedCountry(filtered.length === 1 ? filtered[0] : null);
   };
 
   const handleSearch = (event) => {
@@ -48,7 +42,6 @@ const App = () => {
 
   const handleDetails = (country) => {
     setSelectedCountry(country);
-    setChar("");
   };
 
   return (
@@ -56,11 +49,13 @@ const App = () => {
       <h1>Data for countries</h1>
       <Search handleSearch={handleSearch} char={char} />
 
-      {selectedCountry ? (
-        <>
-          <CountryDetails country={selectedCountry} />
-        </>
-      ) : filteredCountries.length <= 10 ? (
+      {char === "" ? null : selectedCountry ? (
+        <CountryDetails country={selectedCountry} />
+      ) : filteredCountries.length > 11 ? (
+        <p>Too many matches. Please make your query more specific.</p>
+      ) : filteredCountries.length === 0 ? (
+        <p>No data matching the input.</p>
+      ) : (
         filteredCountries.map((country) => (
           <Country
             key={country.ccn3}
@@ -68,12 +63,6 @@ const App = () => {
             handleDetails={() => handleDetails(country)}
           />
         ))
-      ) : (
-        <p>
-          {char === ""
-            ? ""
-            : "Too many matches. Please make your query more specific."}
-        </p>
       )}
     </div>
   );
