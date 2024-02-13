@@ -63,7 +63,7 @@ app.get("/api/notes/:id", (request, response) => {
   }
 });
 
-const generateTd = () => {
+const generatedId = () => {
   const maxId = notes.length > 0 ? Math.max(...notes.map((n) => n.id)) : 0;
   return maxId + 1;
 };
@@ -80,7 +80,7 @@ app.post("/api/notes", (req, res) => {
   const note = {
     content: body.content,
     important: Boolean(body.important) || false,
-    id: generateId(),
+    id: generatedId(),
   };
 
   notes = notes.concat(note);
