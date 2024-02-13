@@ -1,22 +1,27 @@
 const express = require("express");
 const morgan = require("morgan");
+const cors = require("cors");
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 // 3.7: Phonebook backend step 7
-app.use(morgan('tiny'));
+app.use(morgan("tiny"));
 
 // 3.8*: Phonebook backend step 8
-morgan.token('post-data', (req, res) => {
-    if (req.method === 'POST') {
-      return JSON.stringify(req.body);
-    }
-    return 'none';
-  });
+morgan.token("post-data", (req, res) => {
+  if (req.method === "POST") {
+    return JSON.stringify(req.body);
+  }
+  return "none";
+});
 
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :post-data'));
-
+app.use(
+  morgan(
+    ":method :url :status :res[content-length] - :response-time ms :post-data"
+  )
+);
 
 let persons = [
   {
@@ -103,7 +108,7 @@ app.post("/api/persons", (req, res) => {
   res.json(person);
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
