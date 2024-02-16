@@ -1,9 +1,11 @@
 const express = require("express");
 require("dotenv").config();
 const morgan = require("morgan");
-const cors = require("cors");
 const app = express();
+
 const Person = require("./models/person");
+
+app.use(express.static("dist"));
 
 const requestLogger = (request, response, next) => {
   console.log("Method:", request.method);
@@ -13,10 +15,26 @@ const requestLogger = (request, response, next) => {
   next();
 };
 
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "malformatted id" });
+  } else if (error.name === "ValidationError") {
+    return response.status(400).json({ error: error.message });
+  }
+  next(error);
+};
+
+const cors = require("cors");
+
 app.use(cors());
-app.use(express.static("dist"));
 app.use(express.json());
 app.use(requestLogger);
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: "unknown endpoint" });
+};
 
 // 3.7: Phonebook backend step 7
 app.use(morgan("tiny"));
@@ -35,8 +53,6 @@ app.use(
   )
 );
 
-let persons = [];
-
 app.get("/", (req, res) => {
   res.send("<h1>Hello world</h1>");
 });
@@ -47,34 +63,30 @@ app.get("/api/persons", (req, res) => {
   });
 });
 
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
   const body = req.body;
-
-  if (body.name === undefined || body.number === undefined) {
-    return res.status(400).json({
-      error: "The name or number is missing",
-    });
-  }
 
   const person = new Person({
     name: body.name,
     number: body.number,
   });
 
-  person.save().then((savedPerson) => {
-    res.json(savedPerson);
-  });
+  person
+    .save()
+    .then((savedPerson) => {
+      res.json(savedPerson);
+    })
+    .catch((error) => next(error));
 });
 
 app.get("/api/info", (req, res, next) => {
-  Person.find({})
-    .then((persons) => {
-      const info = `
+  Person.find({}).then((persons) => {
+    const info = `
         <p>Phonebook has info for ${persons.length} people.</p>
         <p>Request received at ${new Date()}</p>
       `;
-      res.send(info);
-    })
+    res.send(info);
+  });
 });
 
 app.get("/api/persons/:id", (req, res, next) => {
@@ -90,42 +102,28 @@ app.get("/api/persons/:id", (req, res, next) => {
 });
 
 app.put("/api/persons/:id", (req, res, next) => {
-  const body = req.body
+  const { name, number } = req.body;
 
-  const person ={
-    name: body.name,
-    number: body.number,
-  }
-
-  Person.findByIdAndUpdate(req.params.id, person, {new: true})
-  .then(updatedPerson => {
-    res.json(updatedPerson)
-  })
-  .catch(error => next(error))
+  Person.findByIdAndUpdate(
+    req.params.id,
+    { name, number },
+    { new: true, runValidators: true, context: "query" }
+  )
+    .then((updatedPerson) => {
+      res.json(updatedPerson);
+    })
+    .catch((error) => next(error));
 });
 
 app.delete("/api/persons/:id", (req, res) => {
-  Person.findByIdAndDelete(req.params.id).then((result) => {
-    res.status(204).end();
-  })
-  .catch(error => next(error))
+  Person.findByIdAndDelete(req.params.id)
+    .then((result) => {
+      res.status(204).end();
+    })
+    .catch((error) => next(error));
 });
 
-const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: "unknown endpoint" });
-};
-
 app.use(unknownEndpoint);
-
-const errorHandler = (error, request, response, next) => {
-  console.error(error.message);
-
-  if (error.name === "CastError") {
-    return response.status(400).send({ error: "malformatted id" });
-  }
-  next(error);
-};
-
 app.use(errorHandler);
 
 const PORT = process.env.PORT;

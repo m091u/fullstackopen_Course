@@ -27,7 +27,6 @@ const App = () => {
     const personObject = {
       name: newName,
       number: newNumber,
-      // id: persons.length + 1,
     };
 
     const existingPerson = persons.find(
@@ -59,12 +58,13 @@ const App = () => {
           .catch((error) => {
             console.error("Error updating person: ", error);
             setNotification({
-              message: `Information of ${existingPerson.name}  has already been removed from phonebook`,
+              // message: `Information of ${existingPerson.name}  has already been removed from phonebook`,
+              message: `Validation failed: ${error.response.data.error} `,
               isError: true,
             });
             setTimeout(() => {
               setNotification(null);
-            }, 4000);
+            }, 5000);
           });
       }
     } else {
@@ -81,7 +81,18 @@ const App = () => {
             setNotification(null);
           }, 4000);
         })
-        .catch((error) => console.error("Error updating person: ", error));
+        .catch((error) => {
+          console.error("Error updating person: ", error);
+          console.log(error.response.data.error);
+          setNotification({
+            message: `Validation failed. ${error.response.data.error}`,
+            // message: error.response.data.error,
+            isError: true,
+          });
+          setTimeout(() => {
+            setNotification(null);
+          }, 50000);
+        });
     }
     setNewName("");
     setNewNumber("");
@@ -118,11 +129,23 @@ const App = () => {
 
     const confirmDelete = window.confirm(`Delete ${personToDelete.name}?`);
     if (confirmDelete) {
-      personServices.deletePerson(id).then((returnedList) => {
-        const updatedList = persons.filter((person) => person.id !== id);
-        setPersons(updatedList);
-        setFilteredNames(updatedList);
-      });
+      personServices
+        .deletePerson(id)
+        .then((returnedList) => {
+          const updatedList = persons.filter((person) => person.id !== id);
+          setPersons(updatedList);
+          setFilteredNames(updatedList);
+        })
+        .catch((error) => {
+          console.error("Error deleting person: ", error);
+          setNotification({
+            message: error.response.data.error,
+            isError: true,
+          });
+          setTimeout(() => {
+            setNotification(null);
+          }, 4000);
+        });
     }
   };
 
@@ -130,8 +153,8 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
       <Notification
-        message={notification?.message}
-        isError={notification?.isError}
+        message={notification ? notification.message : ""}
+        isError={notification ? notification.isError : false}
       />
       <Search handleSearch={handleSearch} char={char} />
       <h3>Add a new person</h3>
