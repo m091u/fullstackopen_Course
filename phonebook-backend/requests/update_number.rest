@@ -1,8 +1,0 @@
-
-PUT http://localhost:3001/api/persons/65ce05de8caaf34b48658b7d
-Content-Type: application/json
-
-{
-    "name": "Maria Magdalena",
-    "number": "040-98765"
-}

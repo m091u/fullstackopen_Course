@@ -1,15 +1,15 @@
-const express = require("express");
-const cors = require("cors");
-const app = express();
-require("dotenv").config();
-const Note = require("./models/note");
+const express = require('express')
+const cors = require("cors")
+const app = express()
+require("dotenv").config()
+const Note = require('./models/note')
 
-app.use(express.static("dist"));
+app.use(express.static("dist"))
 
 const requestLogger = (request, response, next) => {
-  console.log("Method:", request.method);
-  console.log("Path:  ", request.path);
-  console.log("Body:  ", request.body);
+  console.log("Method:", request.method)
+  console.log("Path:  ", request.path)
+  console.log("Body:  ", request.body)
   console.log("---");
   next();
 };
