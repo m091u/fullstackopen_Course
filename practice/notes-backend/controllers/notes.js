@@ -44,17 +44,6 @@ notesRouter.post("/", async (request, response) => {
   response.status(201).json(savedNote);
 });
 
-notesRouter.delete("/:id", async (request, response) => {
-  // Note.findByIdAndDelete(request.params.id)
-  //   .then(() => {
-  //     response.status(204).end();
-  //   })
-  //   .catch((error) => next(error));
-
-  await Note.findByIdAndDelete(request.params.id);
-  response.status(204).end();
-});
-
 notesRouter.put("/:id", (request, response, next) => {
   const body = request.body;
 
@@ -68,6 +57,17 @@ notesRouter.put("/:id", (request, response, next) => {
       response.json(updatedNote);
     })
     .catch((error) => next(error));
+});
+
+notesRouter.delete("/:id", async (request, response) => {
+  // Note.findByIdAndDelete(request.params.id)
+  //   .then(() => {
+  //     response.status(204).end();
+  //   })
+  //   .catch((error) => next(error));
+
+  await Note.findByIdAndDelete(request.params.id);
+  response.status(204).end();
 });
 
 module.exports = notesRouter;
