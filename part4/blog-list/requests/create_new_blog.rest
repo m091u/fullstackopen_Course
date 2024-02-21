@@ -3,7 +3,7 @@ Content-Type: application/json
 
 {
     "title": "Reflections of a woman entering Tech",
-    "author": "Madhushree B",
-    "url": "https://medium.com/@madhushree.b/reflections-of-a-woman-entering-tech-af1abf475eec",
+    "author": "Madhushree Boyle",
+    "url": "https://medium.com/@madhushree.b/reflections-of-a-woman-entering-tech",
     "likes": 10
 }

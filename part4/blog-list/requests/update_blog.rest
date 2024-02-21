@@ -1,0 +1,7 @@
+PUT http://localhost:3003/api/blogs/65d0bcb329a7d6e69fe4c92c
+Content-Type: application/json
+
+{
+    "author": "Madhushree Boyle",
+    "likes": 11
+}
