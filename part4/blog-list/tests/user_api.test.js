@@ -1,12 +1,12 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
-const { test, beforeEach, describe } = require("node:test");
+const { test, after, describe, beforeEach } = require("node:test");
 const assert = require("node:assert");
 const mongoose = require("mongoose");
 const supertest = require("supertest");
 const app = require("../app");
-const api = supertest(app);
 
+const api = supertest(app);
 const helper = require("./test_helper");
 
 describe("when there is initially one user in db", () => {
