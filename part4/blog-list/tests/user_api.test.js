@@ -61,4 +61,67 @@ describe("when there is initially one user in db", () => {
 
     assert.strictEqual(usersAtEnd.length, usersAtStart.length);
   });
+
+  test("creation fails with proper statuscode and message if password is too short", async () => {
+    const initialUsers = await api.get("/api/users");
+    const newUser = {
+      "username": "test",
+      "name": "test",
+      "password": "12",
+    };
+
+    const response = await api.post("/api/users").send(newUser).expect(400);
+    console.log(response.body); 
+    assert(response.body.error.includes("Password must be at least 3 characters long."));
+
+    const usersAtEnd = await helper.usersInDb();
+
+    assert.strictEqual(usersAtEnd.length, initialUsers.body.length);
+  })
+
+  test("creation fails with proper statuscode and message if username is too short", async () => {
+    const initialUsers = await api.get("/api/users");
+    const newUser = {
+      "username": "eo",
+      "name": "test",
+      "password": "12345",
+    };
+
+    const response = await api.post("/api/users").send(newUser).expect(400);
+    assert(response.body.error.includes("Username must be at least 3 characters long."));
+
+    const usersAtEnd = await helper.usersInDb();
+
+    assert.strictEqual(usersAtEnd.length, initialUsers.body.length);
+  })
+
+  test("creation fails with proper statuscode and message if password is missing", async () => {
+    const initialUsers = await api.get("/api/users");
+    const newUser = {
+      "username": "test",
+      "name": "testUser",
+    };
+
+    const response = await api.post("/api/users").send(newUser).expect(400);
+    assert(response.body.error.includes("Username and password are required."));
+    const usersAtEnd = await helper.usersInDb();
+
+    assert.strictEqual(usersAtEnd.length,initialUsers.body.length);
+  });
+
+  test("creation fails with proper statuscode and message if username is missing", async () => {
+    const initialUsers = await api.get("/api/users");
+
+    const newUser = {
+      "name": "Superuser",
+      "password": "password"
+    };
+
+   const response = await api.post("/api/users").send(newUser).expect(400);
+    assert(response.body.error.includes("Username and password are required."));
+    const usersAtEnd = await helper.usersInDb();
+
+    assert.strictEqual(usersAtEnd.length,initialUsers.body.length);
+  });
+
 });

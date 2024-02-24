@@ -11,14 +11,12 @@ const userSchema = new mongoose.Schema({
   passwordHash: {
     type: String,
     required: [true, "Password is required."],
-    minLength: [3,"Password must be at least 3 characters long"]
+    minLength: [3,"Password must be at least 3 characters long."]
   },
-  blogs: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Blog",
-    },
-  ],
+  blogs: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Blog"
+  }]
 });
 
 userSchema.set("toJSON", {

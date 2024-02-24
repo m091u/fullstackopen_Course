@@ -1,9 +1,10 @@
 POST http://localhost:3003/api/blogs/
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFsZXgiLCJpZCI6IjY1ZDhhZTJlZDY5ODU0MzUyNDM0YzEyNiIsImlhdCI6MTcwODc4NzQ1M30.hQG3naUtNi2B7ade9ECLkq3NqjLMZDCZNW5cjjRGTbo
 
 {
-    "title": "Reflections of a woman entering Tech",
-    "author": "Madhushree Boyle",
-    "url": "https://medium.com/@madhushree.b/reflections-of-a-woman-entering-tech",
-    "likes": 10
+    "title": "Test case with user login",
+    "author": "Mary T",
+    "url": "https://medium.com",
+    "likes": 9
 }
