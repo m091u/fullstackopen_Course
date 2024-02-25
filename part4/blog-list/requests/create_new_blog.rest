@@ -1,10 +1,10 @@
 POST http://localhost:3003/api/blogs/
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFsZXgiLCJpZCI6IjY1ZDhhZTJlZDY5ODU0MzUyNDM0YzEyNiIsImlhdCI6MTcwODc4NzQ1M30.hQG3naUtNi2B7ade9ECLkq3NqjLMZDCZNW5cjjRGTbo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5ld3VzZXIiLCJpZCI6IjY1ZGI2NTU2MjMyM2M5ZGI1ZDVjNzE1MiIsImlhdCI6MTcwODg3NzE3MywiZXhwIjoxNzA4ODgwNzczfQ.RKgiD30ZFR4d6Iu_tvU6aXr0lCVxzIxNE68RdRpLjSI
 
 {
-    "title": "Test case with user login",
-    "author": "Mary T",
+    "title": "Blog with user arter middleware extraction",
+    "author": "John D",
     "url": "https://medium.com",
-    "likes": 9
+    "likes": 2
 }
