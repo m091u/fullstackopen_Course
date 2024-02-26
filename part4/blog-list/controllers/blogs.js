@@ -3,6 +3,7 @@ const { request, response } = require("../app");
 const jwt = require("jsonwebtoken");
 const Blog = require("../models/blog");
 const User = require("../models/user");
+const { error } = require("../utils/logger");
 
 blogsRouter.get("/", async (request, response) => {
   const blogs = await Blog.find({}).populate("user");
@@ -11,12 +12,17 @@ blogsRouter.get("/", async (request, response) => {
 
 blogsRouter.post("/", async (request, response) => {
   const body = request.body;
+  const user = request.user;
 
-  const decodedToken = jwt.verify(request.token, process.env.SECRET);
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: "token invalid" });
+  // const decodedToken = jwt.verify(request.token, process.env.SECRET);
+  // if (!decodedToken.id) {
+  //   return response.status(401).json({ error: "token invalid" });
+  // }
+  if (!user || !user.id) {
+    return response.status(401).json({ error: "You are not authorized to create a blog" });
   }
-  const user = await User.findById(decodedToken.id);
+
+  const currentUser = await User.findById(user.id);
 
   const blog = new Blog({
     ...request.body,
@@ -24,9 +30,9 @@ blogsRouter.post("/", async (request, response) => {
   });
 
   const savedBlog = await blog.save();
-  user.blogs = user.blogs.concat(savedBlog._id);
+  currentUser.blogs = currentUser.blogs.concat(savedBlog._id);
 
-  await user.save();
+  await currentUser.save();
   response.status(201).json(savedBlog);
 });
 

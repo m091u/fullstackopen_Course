@@ -3,11 +3,22 @@ const assert = require("node:assert");
 const mongoose = require("mongoose");
 const supertest = require("supertest");
 const app = require("../app");
+const jwt = require("jsonwebtoken");
 
 const api = supertest(app);
 
-describe("initial blogs retrieval", () => {
+let token;
 
+beforeEach(async () => {
+  const loginResponse = await api.post("/api/login").send({
+    username: "testuser",
+    password: "testpassword",
+  });
+
+  token = loginResponse.body.token;
+});
+
+describe("initial blogs retrieval", () => {
   test("blogs are returned as json", async () => {
     await api
       .get("/api/blogs")
@@ -32,21 +43,32 @@ describe("initial blogs retrieval", () => {
   describe("addition of a new blog", () => {
     test("a valid blog can be added ", async () => {
       const newBlog = {
-        "title": "Test",
-        "author": "Test Author",
-        "url": "https://test.com",
-        "likes": 1
+        title: "Test",
+        author: "Test Author",
+        url: "https://test.com",
+        likes: 1,
       };
+      console.log("Sending request with body:", newBlog);
 
       const initialBlogs = await api.get("/api/blogs");
 
-      await api
+      // await api
+      //   .post("/api/blogs")
+      //   .send(newBlog)
+      //   .set('Authorization', `Bearer ${token}`)
+      //   .expect(201)
+      //   .expect("Content-Type", /application\/json/);
+
+      // const response = await api.get("/api/blogs");
+      // console.log('Received response:', response.body);
+      const response = await api
         .post("/api/blogs")
         .send(newBlog)
+        .set("Authorization", `Bearer ${token}`) // Set Authorization header with token
         .expect(201)
         .expect("Content-Type", /application\/json/);
 
-      const response = await api.get("/api/blogs");
+      console.log("Received response:", response.body);
 
       const titles = response.body.map((r) => r.title);
 
@@ -64,6 +86,7 @@ describe("initial blogs retrieval", () => {
       const response = await api
         .post("/api/blogs")
         .send(newBlog)
+        .set("Authorization", `Bearer ${token}`)
         .expect(201)
         .expect("Content-Type", /application\/json/);
 
@@ -97,6 +120,7 @@ describe("initial blogs retrieval", () => {
       await api
         .put(`/api/blogs/${blogToUpdate.id}`)
         .send(updatedBlog)
+        .set("Authorization", `Bearer ${token}`)
         .expect(200)
         .expect("Content-Type", /application\/json/);
 
@@ -139,7 +163,10 @@ describe("initial blogs retrieval", () => {
       const initialBlogs = await api.get("/api/blogs");
       const blogToDelete = initialBlogs.body[1];
 
-      await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+      await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(204);
 
       const finalBlogs = await api.get("/api/blogs");
 

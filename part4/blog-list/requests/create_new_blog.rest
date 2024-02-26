@@ -3,7 +3,7 @@ Content-Type: application/json
 Authorization: Bearer 
 
 {
-    "title": "Blog with user arter middleware extraction",
+    "title": "Testing create blog with auth",
     "author": "John D",
     "url": "https://medium.com",
     "likes": 2
