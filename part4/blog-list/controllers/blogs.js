@@ -14,10 +14,6 @@ blogsRouter.post("/", async (request, response) => {
   const body = request.body;
   const user = request.user;
 
-  // const decodedToken = jwt.verify(request.token, process.env.SECRET);
-  // if (!decodedToken.id) {
-  //   return response.status(401).json({ error: "token invalid" });
-  // }
   if (!user || !user.id) {
     return response.status(401).json({ error: "You are not authorized to create a blog" });
   }
@@ -26,7 +22,7 @@ blogsRouter.post("/", async (request, response) => {
 
   const blog = new Blog({
     ...request.body,
-    user: user._id,
+    user: currentUser._id,
   });
 
   const savedBlog = await blog.save();

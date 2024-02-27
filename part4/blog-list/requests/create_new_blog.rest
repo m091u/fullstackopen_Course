@@ -3,8 +3,8 @@ Content-Type: application/json
 Authorization: Bearer 
 
 {
-    "title": "Testing create blog with auth",
-    "author": "John D",
-    "url": "https://medium.com",
-    "likes": 2
+    "title": "Reflections of a woman entering Tech",
+    "author": "Madhushree Boyle",
+    "url": "https://medium.com/@madhushree.b/reflections-of-a-woman-entering-tech",
+    "likes": 11
 }

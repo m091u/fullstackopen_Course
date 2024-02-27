@@ -6,13 +6,15 @@ const app = require("../app");
 const jwt = require("jsonwebtoken");
 
 const api = supertest(app);
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 let token;
 
 beforeEach(async () => {
   const loginResponse = await api.post("/api/login").send({
-    username: "testuser",
-    password: "testpassword",
+    username: "root",
+    password: "sekret",
   });
 
   token = loginResponse.body.token;
@@ -29,7 +31,7 @@ describe("initial blogs retrieval", () => {
   test("correct amount of blog posts is returned", async () => {
     const response = await api.get("/api/blogs");
 
-    assert.strictEqual(response.body.length, 2);
+    assert.strictEqual(response.body.length, 3);
   });
 
   test('blog posts have property "id" instead of "_id"', async () => {
@@ -41,39 +43,31 @@ describe("initial blogs retrieval", () => {
   });
 
   describe("addition of a new blog", () => {
-    test("a valid blog can be added ", async () => {
+
+    test("a valid blog can be added", async () => {
       const newBlog = {
-        title: "Test",
+        title: "Test Blog Post 2",
         author: "Test Author",
         url: "https://test.com",
         likes: 1,
       };
-      console.log("Sending request with body:", newBlog);
 
       const initialBlogs = await api.get("/api/blogs");
 
-      // await api
-      //   .post("/api/blogs")
-      //   .send(newBlog)
-      //   .set('Authorization', `Bearer ${token}`)
-      //   .expect(201)
-      //   .expect("Content-Type", /application\/json/);
-
-      // const response = await api.get("/api/blogs");
-      // console.log('Received response:', response.body);
-      const response = await api
+      const req = await api
         .post("/api/blogs")
         .send(newBlog)
-        .set("Authorization", `Bearer ${token}`) // Set Authorization header with token
+        .set("Authorization", `Bearer ${token}`)
         .expect(201)
         .expect("Content-Type", /application\/json/);
 
-      console.log("Received response:", response.body);
+      const response = await api.get("/api/blogs");
 
       const titles = response.body.map((r) => r.title);
 
       assert.strictEqual(response.body.length, initialBlogs.body.length + 1);
       assert(titles.includes("Test Blog Post 2"));
+
     });
 
     test("missing likes property is defaulted to 0 ", async () => {
@@ -100,7 +94,7 @@ describe("initial blogs retrieval", () => {
         author: "Test Author 3",
       };
 
-      await api.post("/api/blogs").send(newBlog).expect(400);
+      await api.post("/api/blogs").send(newBlog).set("Authorization", `Bearer ${token}`).expect(400);
 
       const response = await api.get("/api/blogs");
       assert.strictEqual(response.body.length, initialBlogs.body.length);
@@ -164,9 +158,9 @@ describe("initial blogs retrieval", () => {
       const blogToDelete = initialBlogs.body[1];
 
       await api
-      .delete(`/api/blogs/${blogToDelete.id}`)
-      .set('Authorization', `Bearer ${token}`)
-      .expect(204);
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .set("Authorization", `Bearer ${token}`)
+        .expect(204);
 
       const finalBlogs = await api.get("/api/blogs");
 
