@@ -3,6 +3,7 @@ import "./App.css";
 import Note from "./components/Note";
 import noteService from "./services/notes";
 import Notification from "./components/Error";
+import loginService from "./services/login";
 
 const Footer = () => {
   const footerStyle = {
@@ -25,6 +26,9 @@ const App = (props) => {
   const [newNote, setNewNote] = useState("a new note...");
   const [showAll, setShowAll] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     noteService.getAll().then((initialNotes) => {
@@ -72,11 +76,53 @@ const App = (props) => {
       });
   };
 
+  const handleLogin = async (event) => {
+    event.preventDefault();
+
+    try {
+      const user = await loginService.login({
+        username, password
+      })
+      setUser(user)
+      setUsername('')
+      setPassword('')
+    }
+    catch (exception){
+      setErrorMessage('Wrong credentials')
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
+  };
+
   return (
     <>
       <div>
         <h1>Notes</h1>
         <Notification message={errorMessage} />
+
+        <form onSubmit={handleLogin}> 
+
+          <div>
+            username{" "}
+            <input
+              type="text"
+              value={username}
+              name="Username"
+              onChange={({ target }) => setUsername(target.value)}
+            />
+          </div>
+          <div>
+            password{" "}
+            <input
+              type="password"
+              value={password}
+              name="Password"
+              onChange={({ target }) => setPassword(target.value)}
+            />
+          </div>
+          <button type="submit">login</button>
+        </form>
         <div>
           <button onClick={() => setShowAll(!showAll)}>
             {" "}

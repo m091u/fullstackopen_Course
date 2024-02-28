@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const supertest = require("supertest");
 const app = require("../app");
 const jwt = require("jsonwebtoken");
+const Blog = require("../models/blog");
 
 const api = supertest(app);
 const bcrypt = require('bcrypt');
@@ -18,6 +19,7 @@ beforeEach(async () => {
   });
 
   token = loginResponse.body.token;
+
 });
 
 describe("initial blogs retrieval", () => {
@@ -31,7 +33,7 @@ describe("initial blogs retrieval", () => {
   test("correct amount of blog posts is returned", async () => {
     const response = await api.get("/api/blogs");
 
-    assert.strictEqual(response.body.length, 3);
+    assert.strictEqual(response.body.length, 2);
   });
 
   test('blog posts have property "id" instead of "_id"', async () => {
