@@ -5,22 +5,7 @@ import noteService from "./services/notes";
 import Notification from "./components/Error";
 import loginService from "./services/login";
 import Login from "./components/Login";
-
-const Footer = () => {
-  const footerStyle = {
-    color: "green",
-    fontStyle: "italic",
-    fontSize: 16,
-  };
-  return (
-    <div style={footerStyle}>
-      <br />
-      <em>
-        Note app, Department of Computer Science, University of Helsinki 2024
-      </em>
-    </div>
-  );
-};
+import Footer from "./components/Footer";
 
 const App = (props) => {
   const [notes, setNotes] = useState([]);
@@ -30,6 +15,16 @@ const App = (props) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
+
+
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedNoteappUser')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+      noteService.setToken(user.token)
+    }
+  }, [])
 
   useEffect(() => {
     noteService.getAll().then((initialNotes) => {
@@ -42,17 +37,12 @@ const App = (props) => {
     const noteObject = {
       content: newNote,
       important: Math.random() < 0.5,
-      // id: notes.length + 1,
     };
 
     noteService.create(noteObject).then((returnedNote) => {
       setNotes(notes.concat(returnedNote));
       setNewNote("");
     });
-  };
-
-  const handleNoteChange = (event) => {
-    setNewNote(event.target.value);
   };
 
   const notesToShow = showAll ? notes : notes.filter((note) => note.important);
@@ -77,17 +67,23 @@ const App = (props) => {
       });
   };
 
+  const handleNoteChange = (event) => {
+    setNewNote(event.target.value);
+  };
+
   const handleUsername = (e) => setUsername(e.target.value);
   const handlePassword = (e) => setPassword(e.target.value);
 
   const handleLogin = async (event) => {
     event.preventDefault();
-
     try {
       const user = await loginService.login({
         username,
         password,
       });
+
+      window.localStorage.setItem("loggedNoteappUser", JSON.stringify(user));
+      noteService.setToken(user.token);
       setUser(user);
       setUsername("");
       setPassword("");
@@ -113,12 +109,13 @@ const App = (props) => {
         <Notification message={errorMessage} />
 
         {user === null ? (
-          <Login 
-          handleLogin={handleLogin}
-          username={username}
-          password={password}
-          handleUsername={handleUsername}
-          handlePassword={handlePassword}/>
+          <Login
+            handleLogin={handleLogin}
+            username={username}
+            password={password}
+            handleUsername={handleUsername}
+            handlePassword={handlePassword}
+          />
         ) : (
           <div>
             <p>{user.name} logged-in</p>
@@ -132,6 +129,7 @@ const App = (props) => {
             show {showAll ? "important" : "all"}
           </button>
         </div>
+        
         <ul>
           {notesToShow.map((note) => (
             <Note
