@@ -61,12 +61,30 @@ const App = (props) => {
       author: author,
       url: url,
     };
-    blogService.create(blogObject).then((returnedBlog) => {
-      setBlogs(blogs.concat(returnedBlog));
-      setTitle("");
-      setAuthor("");
-      setUrl("");
-    });
+    blogService
+      .create(blogObject)
+      .then((returnedBlog) => {
+        setBlogs(blogs.concat(returnedBlog));
+        setTitle("");
+        setAuthor("");
+        setUrl("");
+        setErrorMessage(
+          `a new blog ${returnedBlog.title} by ${returnedBlog.author} added`
+        );
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      })
+      .catch((error) => {
+        if (error.response && error.response.data) {
+          setErrorMessage(error.response.data.error);
+        } else {
+          setErrorMessage("An unexpected error occurred");
+        }
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      });
   };
 
   return (
@@ -75,6 +93,7 @@ const App = (props) => {
         <div>
           <h2>Log in to application</h2>
           <Notification message={errorMessage} />
+
           <form onSubmit={handleLogin}>
             <div>
               username
@@ -99,6 +118,7 @@ const App = (props) => {
         </div>
       ) : (
         <div>
+          <Notification message={errorMessage} />
           <h2>Blogs</h2>
           <p>{user.name} is logged-in</p>
           <button onClick={handleLogout}>Logout</button>

@@ -1,19 +1,19 @@
-const express = require("express")
-require("dotenv").config()
-const morgan = require("morgan")
-const app = express()
+const express = require("express");
+require("dotenv").config();
+const morgan = require("morgan");
+const app = express();
 
-const Person = require("./models/person")
+const Person = require("./models/person");
 
-app.use(express.static("dist"))
+app.use(express.static("dist"));
 
 const requestLogger = (request, response, next) => {
-  console.log("Method:", request.method)
-  console.log("Path:  ", request.path)
-  console.log("Body:  ", request.body)
-  console.log("---")
-  next()
-}
+  console.log("Method:", request.method);
+  console.log("Path:  ", request.path);
+  console.log("Body:  ", request.body);
+  console.log("---");
+  next();
+};
 
 const errorHandler = (error, request, response, next) => {
   console.error(error.message);
