@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./App.css";
 import Note from "./components/Note";
 import noteService from "./services/notes";
@@ -9,15 +9,16 @@ import Footer from "./components/Footer";
 import NoteForm from "./components/NoteForm";
 import Togglable from "./components/Togglable";
 
-const App = (props) => {
+const App = () => {
   const [notes, setNotes] = useState([]);
-  const [newNote, setNewNote] = useState("a new note...");
   const [showAll, setShowAll] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
   const [loginVisible, setLoginVisible] = useState(false);
+
+  const noteFormRef = useRef();
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedNoteappUser");
@@ -35,12 +36,11 @@ const App = (props) => {
   }, []);
 
   const addNote = (noteObject) => {
-    noteService
-      .create(noteObject)
-      .then(returnedNote => {
-        setNotes(notes.concat(returnedNote))
-      })
-  }
+    noteFormRef.current.toggleVisibility();
+    noteService.create(noteObject).then((returnedNote) => {
+      setNotes(notes.concat(returnedNote));
+    });
+  };
 
   const toggleImportance = (id) => {
     const note = notes.find((n) => n.id === id);
@@ -112,11 +112,6 @@ const App = (props) => {
     );
   };
 
-  const noteForm = () => (
-    <Togglable buttonLabel='new note'>
-      <NoteForm createNote={addNote} />
-    </Togglable>
-  );
 
   return (
     <>
@@ -129,12 +124,8 @@ const App = (props) => {
         {user && (
           <div>
             <p>{user.name} logged-in</p>
-            <Togglable buttonLabel="new note">
-              <NoteForm
-                onSubmit={addNote}
-                value={newNote}
-                handleChange={handleNoteChange}
-              />
+            <Togglable buttonLabel="new note" ref={noteFormRef}>
+              <NoteForm createNote={addNote} />
             </Togglable>
           </div>
         )}
