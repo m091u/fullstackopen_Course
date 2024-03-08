@@ -9,12 +9,13 @@ import Togglable from "./components/Togglable";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
+  const [users, setUsers] = useState({});
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
-  const blogFormRef = useRef()
+  const blogFormRef = useRef();
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
@@ -26,7 +27,13 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
+    // blogService.getAll().then((blogs) => setBlogs(blogs));
+    const fetchBlogs = async () => {
+      const fetchedBlogs = await blogService.getAll();
+      const sortedBlogs = fetchedBlogs.sort((a, b) => b.likes - a.likes);
+      setBlogs(sortedBlogs);
+    };
+    fetchBlogs();
   }, []);
 
   const handleLogin = async (event) => {
@@ -55,30 +62,47 @@ const App = () => {
     setUser(null);
   };
 
-  const addBlog = (blogObject) => {
-    blogFormRef.current.toggleVisibility();
-    blogService
-      .create(blogObject)
-      .then((returnedBlog) => {
-        setBlogs(blogs.concat(returnedBlog));
-        setErrorMessage(
-          `a new blog ${returnedBlog.title} by ${returnedBlog.author} added`
-        );
-        setTimeout(() => {
-          setErrorMessage(null);
-        }, 5000);
-      })
-      .catch((error) => {
-        if (error.response && error.response.data) {
-          setErrorMessage(error.response.data.error);
-        } else {
-          setErrorMessage("An unexpected error occurred");
-        }
-        setTimeout(() => {
-          setErrorMessage(null);
-        }, 5000);
-      });
+  const addBlog = async (blogObject) => {
+    try {
+      blogFormRef.current.toggleVisibility();
+      const returnedBlog = await blogService.create(blogObject);
+      setBlogs([...blogs, returnedBlog]);
+      setErrorMessage(
+        `A new blog ${returnedBlog.title} by ${returnedBlog.author} added`
+      );
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    } catch (error) {
+      if (error.response && error.response.data) {
+        setErrorMessage(error.response.data.error);
+      } else {
+        setErrorMessage("An unexpected error occurred");
+      }
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    }
   };
+
+  const handleDelete = async (id, title, author) => {
+    const confirmation = window.confirm(
+      `Are you sure you want to delete "${title}" by ${author}?`
+    );
+    if (confirmation) {
+      try {
+        await blogService.remove(id);
+        setBlogs(blogs.filter((blog) => blog.id !== id)); 
+        setErrorMessage("Blog deleted successfully");
+        setTimeout(() => {
+          setErrorMessage(null);
+        }, 5000);
+      } catch (error) {
+        console.error("Error deleting blog:", error);
+      }
+    }
+  };
+
 
   return (
     <>
@@ -116,15 +140,18 @@ const App = () => {
           <p>{user.name} is logged-in</p>
           <button onClick={handleLogout}>Logout</button>
           <hr />
-          <Togglable buttonLabel="New blog" ref={blogFormRef}>
-            <BlogForm
-             createBlog={addBlog}
-            />
+          <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
+            <BlogForm createBlog={addBlog} />
           </Togglable>
           <hr />
           <div>
             {blogs.map((blog) => (
-              <Blog key={blog.id} blog={blog} />
+              <Blog
+                key={blog.id}
+                blog={blog}
+                loggedInUser={user}
+                handleDelete={handleDelete} 
+              />
             ))}
           </div>
         </div>

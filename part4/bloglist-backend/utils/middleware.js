@@ -55,6 +55,8 @@ const errorHandler = (error, request, response, next) => {
     return response.status(401).json({
       error: "user is not authorized",
     })
+  } else if (error.message === "UpdateLikesError") {
+    return response.status(404).json({ error: "Blog not found for updating likes" });
   }
 
   next(error);

@@ -6,7 +6,8 @@ const User = require("../models/user");
 const { error } = require("../utils/logger");
 
 blogsRouter.get("/", async (request, response) => {
-  const blogs = await Blog.find({}).populate("user");
+  const blogs = await Blog.find({}).populate("user", { username: 1, name: 1 });
+
   response.json(blogs);
 });
 
@@ -15,7 +16,9 @@ blogsRouter.post("/", async (request, response) => {
   const user = request.user;
 
   if (!user || !user.id) {
-    return response.status(401).json({ error: "You are not authorized to create a blog" });
+    return response
+      .status(401)
+      .json({ error: "You are not authorized to create a blog" });
   }
 
   const currentUser = await User.findById(user.id);
@@ -43,10 +46,28 @@ blogsRouter.put("/:id", async (request, response) => {
   response.json(updatedBlog);
 });
 
+//increase likes
+blogsRouter.put("/:id", async (request, response) => {
+  const { id } = req.params;
+  const updatedBlogData = req.body;
+
+  const updatedBlog = await Blog.findByIdAndUpdate(id, updatedBlogData, {
+    new: true,
+  });
+
+  if (!updatedBlog) {
+    return next(new Error("UpdateLikesError"));
+  }
+
+  response.json(updatedBlog);
+});
+
 blogsRouter.delete("/:id", async (request, response) => {
   const decodedToken = jwt.verify(request.token, process.env.SECRET);
   if (!decodedToken.id) {
-    return response.status(401).json({ error: "You are not authorized to delete this blog" });
+    return response
+      .status(401)
+      .json({ error: "You are not authorized to delete this blog" });
   }
 
   const blog = await Blog.findById(request.params.id);
