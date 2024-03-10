@@ -48,8 +48,8 @@ const Blog = ({ blog, loggedInUser, handleDelete }) => {
 
   return (
     <>
-      <div style={blogStyle}>
-        {blog.title} {blog.author}
+      <div style={blogStyle} className='blog'>
+        {blog.title}{blog.author}
         <button style={{ marginLeft: 5 }} onClick={toggleVisibility}>
           {detailsVisible ? 'hide' : 'view'}
         </button>

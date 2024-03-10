@@ -18,7 +18,7 @@ const BlogForm = ({ createBlog }) => {
   }
 
   return (
-    <div>
+    <div className="formDiv">
       <h2>Create new blog</h2>
 
       <form onSubmit={addBlog}>
