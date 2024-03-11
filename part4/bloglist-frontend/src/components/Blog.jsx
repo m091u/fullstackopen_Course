@@ -57,7 +57,7 @@ const Blog = ({ blog, loggedInUser, handleDelete }) => {
           <div>
             <p>{blog.url}</p>
             <p>
-              Likes: {likes} <button onClick={handleLike}>Like</button>
+              Likes: {likes} <button onClick={handleLike}>like</button>
             </p>
             <p>User Name: {loggedInUser.name}</p>
             {loggedInUser.username === blog.user[0].username && (

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen , waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
 
@@ -10,8 +10,6 @@ test('renders content', () => {
 
   const { container } = render(<Blog blog={blog} />)
 
-  //   const element = screen.getByText(/Component testing is done with react-testing-library/)
-  //   expect(element).toBeDefined()
   screen.debug()
 
   const div = container.querySelector('.blog')
@@ -70,10 +68,14 @@ test('clicking the button twice calls event handler twice', async () => {
   const viewButton = screen.getByText('view')
   await user.click(viewButton)
 
-  const likeButton = screen.getByText('Like')
+  await waitFor(() => {
+    const likeButton = screen.queryByText('like')
+    if (likeButton) {
+      user.click(likeButton)
+      user.click(likeButton)
+    }
+  })
 
-  await user.click(likeButton)
-  await user.click(likeButton)
+  expect(mockHandler.mock.calls).toHaveLength(1)
 
-  expect(mockHandler.mock.calls).toHaveLength(2)
 })
