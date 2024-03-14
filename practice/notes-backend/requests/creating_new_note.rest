@@ -3,7 +3,7 @@ Content-Type: application/json
 Authorization: Bearer 
 
 {
-    "content": "Single page app use token based auth",
+    "content": "Test new note creation",
     "important": false
 }
 
