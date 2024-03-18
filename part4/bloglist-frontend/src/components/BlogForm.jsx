@@ -1,21 +1,21 @@
-import { useState } from 'react'
+import { useState } from "react";
 
 const BlogForm = ({ createBlog }) => {
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
+  const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
+  const [url, setUrl] = useState("");
 
   const addBlog = (event) => {
-    event.preventDefault()
+    event.preventDefault();
     createBlog({
       title: title,
       author: author,
       url: url,
-    })
-    setAuthor('')
-    setTitle('')
-    setUrl('')
-  }
+    });
+    setAuthor("");
+    setTitle("");
+    setUrl("");
+  };
 
   return (
     <div className="formDiv">
@@ -23,25 +23,31 @@ const BlogForm = ({ createBlog }) => {
 
       <form onSubmit={addBlog}>
         <div>
-          Title:{' '}
+          Title:{" "}
           <input
             value={title}
+            id="title"
             onChange={(event) => setTitle(event.target.value)}
-          />{' '}
+          />{" "}
           <br></br>
-          Author:{' '}
+          Author:{" "}
           <input
             value={author}
+            id="author"
             onChange={(event) => setAuthor(event.target.value)}
-          />{' '}
+          />{" "}
           <br></br>
-          Url:{' '}
-          <input value={url} onChange={(event) => setUrl(event.target.value)} />
+          Url:{" "}
+          <input
+            value={url}
+            id="url"
+            onChange={(event) => setUrl(event.target.value)}
+          />
         </div>
-        <button type="submit">Create</button>
+        <button type="submit" id='submit-button'>Create</button>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default BlogForm
+export default BlogForm;

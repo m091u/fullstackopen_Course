@@ -12,11 +12,9 @@ describe("Blog app", () => {
 
   it("Login form is shown", () => {
     cy.contains("Log in to application");
+    cy.contains("username");
+    cy.contains("password");
     cy.contains("Login");
-  });
-
-  it("login form can be opened", function () {
-    cy.contains("Login").click();
   });
 
   describe("Login", function () {
@@ -27,13 +25,35 @@ describe("Blog app", () => {
       cy.get("#login-button").click();
 
       cy.contains("Mira is logged-in");
+      cy.contains('Logout')
     });
 
     it("fails with wrong credentials", function () {
       cy.contains("Log in to application");
       cy.get("#username").type("john");
-      cy.get("#password").type("parola");
+      cy.get("#password").type("wrongpass");
       cy.get("#login-button").click();
+
+      cy.get('.error').should('contain', 'Wrong username or password')
+        .and('have.css', 'color', 'rgb(255, 0, 0)')
     });
   });
+
+  describe('When logged in', function() {
+    beforeEach(function() {
+      cy.contains("Log in to application");
+      cy.get("#username").type("mira");
+      cy.get("#password").type("parola");
+      cy.get("#login-button").click();
+    })
+
+    it('A blog can be created', function() {
+      cy.contains('Create new blog').click()
+      cy.get('#title').type('a blog created by cypress')
+      cy.get('#author').type('cypress')
+      cy.get('#url').type('www.testcypress.com')
+      cy.get("#submit-button").click();
+      cy.contains('a blog created by cypress')
+    })
+  })
 });
