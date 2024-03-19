@@ -36,10 +36,10 @@ blogsRouter.post("/", async (request, response) => {
 });
 
 blogsRouter.put("/:id", async (request, response) => {
-  const { likes, author, url } = request.body;
+  const { title, likes, author, url } = request.body;
   const updatedBlog = await Blog.findByIdAndUpdate(
     request.params.id,
-    { likes, author, url },
+    { title, likes, author, url },
     { new: true }
   );
 

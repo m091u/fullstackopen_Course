@@ -1,3 +1,10 @@
+describe('Blog app', function() {
+  it('front page can be opened', function() {
+    cy.visit('http://localhost:5173')
+    cy.contains('Log in to application')
+  })
+})
+
 describe("Blog app", () => {
   beforeEach(function () {
     cy.request("POST", "http://localhost:3003/api/testing/reset");
@@ -54,6 +61,18 @@ describe("Blog app", () => {
       cy.get('#url').type('www.testcypress.com')
       cy.get("#submit-button").click();
       cy.contains('a blog created by cypress')
+    })
+
+    it('A blog can be liked', function() {
+      cy.contains('Create new blog').click()
+      cy.get('#title').type('a blog created by cypress')
+      cy.get('#author').type('cypress')
+      cy.get('#url').type('www.testcypress.com')
+      cy.get("#submit-button").click();
+      cy.contains('a blog created by cypress')
+      cy.contains('view').click()
+      cy.contains('like').click()
+      cy.contains('Likes: 1') 
     })
   })
 });

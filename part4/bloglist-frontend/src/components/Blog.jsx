@@ -49,7 +49,7 @@ const Blog = ({ blog, loggedInUser, handleDelete }) => {
   return (
     <>
       <div style={blogStyle} className='blog'>
-        {blog.title}{blog.author}
+        {blog.title} <br />Author: {blog.author}
         <button style={{ marginLeft: 5 }} onClick={toggleVisibility}>
           {detailsVisible ? 'hide' : 'view'}
         </button>
@@ -59,7 +59,7 @@ const Blog = ({ blog, loggedInUser, handleDelete }) => {
             <p>
               Likes: {likes} <button onClick={handleLike}>like</button>
             </p>
-            <p>User Name: {loggedInUser.name}</p>
+            <p>User Name: {blog.user[0].name}</p>
             {loggedInUser.username === blog.user[0].username && (
               <button
                 onClick={() => handleDelete(blog.id, blog.title, blog.author)}
