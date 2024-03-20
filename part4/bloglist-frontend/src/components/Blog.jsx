@@ -3,25 +3,8 @@ import axios from 'axios'
 
 const Blog = ({ blog, loggedInUser, handleDelete }) => {
   const [detailsVisible, setDetailsVisible] = useState(false)
-  const [userName, setUserName] = useState('')
   const [likes, setLikes] = useState(blog.likes)
-
-  useEffect(() => {
-    const fetchUserName = async () => {
-      try {
-        if (blog.user && blog.user.length > 0) {
-          const user = blog.user[0]
-          setUserName(user.name)
-        } else {
-          setUserName('')
-        }
-      } catch (error) {
-        console.error('Error fetching user name:', error)
-      }
-    }
-
-    fetchUserName()
-  }, [blog.user])
+  console.log('Received blog:', blog);
 
   const toggleVisibility = () => {
     setDetailsVisible(!detailsVisible)

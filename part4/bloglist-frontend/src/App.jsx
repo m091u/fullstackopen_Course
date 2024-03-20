@@ -9,7 +9,6 @@ import Togglable from './components/Togglable'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [users, setUsers] = useState({})
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -65,7 +64,10 @@ const App = () => {
   const addBlog = async (blogObject) => {
     try {
       blogFormRef.current.toggleVisibility()
+      blogObject.user = user;
+
       const returnedBlog = await blogService.create(blogObject)
+      console.log('the created blog is', returnedBlog);
       setBlogs([...blogs, returnedBlog])
       setErrorMessage(
         `A new blog ${returnedBlog.title} by ${returnedBlog.author} added`

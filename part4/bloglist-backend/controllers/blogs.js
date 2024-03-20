@@ -23,15 +23,22 @@ blogsRouter.post("/", async (request, response) => {
 
   const currentUser = await User.findById(user.id);
 
+  if (!currentUser) {
+    return response.status(404).json({ error: "User not found" });
+  }
+
   const blog = new Blog({
     ...request.body,
-    user: currentUser._id,
+    user: currentUser,
   });
 
-  const savedBlog = await blog.save();
-  currentUser.blogs = currentUser.blogs.concat(savedBlog._id);
+    const savedBlog = await blog.save();
 
-  await currentUser.save();
+    await savedBlog.populate('user', { username: 1, name: 1 })
+
+    currentUser.blogs = currentUser.blogs.concat(savedBlog._id);
+    await currentUser.save();
+
   response.status(201).json(savedBlog);
 });
 
