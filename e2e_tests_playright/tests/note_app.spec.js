@@ -1,9 +1,12 @@
-const { test, expect, describe } = require("@playwright/test");
+const { test, describe, expect, beforeEach } = require('@playwright/test')
+
 
 describe("Note app", () => {
-  test("front page can be opened", async ({ page }) => {
+  beforeEach(async ({ page }) => {
     await page.goto("http://localhost:5173");
+  });
 
+  test("front page can be opened", async ({ page }) => {
     const locator = await page.getByText("Notes");
     await expect(locator).toBeVisible();
     await expect(
@@ -14,16 +17,29 @@ describe("Note app", () => {
   });
 
   test("login form can be opened", async ({ page }) => {
-      await page.goto("http://localhost:5173");
+    await page.getByRole("button", { name: "log in" }).click();
+    await page.getByTestId("username").fill("mira");
+    await page.getByTestId("password").fill("parola");
 
-      await page.getByRole('button', { name: 'log in' }).click();
-     const textboxes = await page.getByRole('textbox').all() 
+    await page.getByRole("button", { name: "log in" }).click();
+    await expect(page.getByText("mira logged-in")).toBeVisible();
+  });
 
-      await textboxes[0].fill('mira')
-      await textboxes[1].fill('parola')
+  describe("when logged in", () => {
+    beforeEach(async ({ page }) => {
+      await page.getByRole("button", { name: "log in" }).click();
+      await page.getByTestId("username").fill("mira");
+      await page.getByTestId("password").fill("parola");
+      await page.getByRole("button", { name: "log in" }).click();
+    });
 
-      await page.getByRole('button', { name: 'log in' }).click()
-      await expect(page.getByText('mira logged-in')).toBeVisible()
-
-  })
+    test("a new note can be created", async ({ page }) => {
+      await page.getByRole("button", { name: "new note" }).click();
+      await page.getByRole("textbox").fill("a note created by playwright");
+      await page.getByRole("button", { name: "save" }).click();
+      await expect(
+        page.getByText("a note created by playwright")
+      ).toBeVisible();
+    });
+  });
 });
