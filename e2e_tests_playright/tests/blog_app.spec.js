@@ -70,19 +70,34 @@ describe("Blog app", () => {
 
       test("it can be deleted", async ({ page }) => {
         await page.getByRole("button", { name: "view" }).click();
+    
+        page.on("dialog", (dialog) => dialog.accept());
         await page.getByRole("button", { name: "Remove" }).click();
-        
-        page.on('dialog', async dialog => {
-            expect(dialog.message().toEqual('Are you sure you want to delete "a blog created by playwright" by mira?'))
-              await dialog.accept();
-            });
-            await page.locator('text=OK').click()
 
-        //   const successMessageLocator = page.locator(".error");
-        //   await expect(successMessageLocator).toContainText("Blog deleted successfully");
-        // await expect(page.getByText("a blog created by playwright")).not.toBeVisible();
+        const successMessageLocator = page.locator(".error");
+        await expect(successMessageLocator).toContainText(
+          "Blog deleted successfully"
+        );
+        await expect(
+          page.getByText("a blog created by playwright")
+        ).not.toBeVisible();
       });
-      
+
+      test("only the user who added the blog can see the delete button", async ({ page }) => {
+        await blogLoginWith(page, "mira", "parola");
+
+        await page.getByRole("button", { name: "Create new blog" }).click();
+        await page.getByTestId("title").fill("a blog created by playwright for testing deletion");
+        await page.getByTestId("author").fill("mira");
+        await page.getByTestId("url").fill("ww.test.com");
+        await page.getByRole("button", { name: "Create" }).click();
+
+        await page.getByRole("button", { name: "Logout" }).click();
+        await blogLoginWith(page, "bela", "parola");
+        await page.getByRole("button", { name: "view" }).click();
+        expect(page.getByRole("button", { name: "Remove" })).not.toBeVisible();
+      })
     });
+
   });
 });
