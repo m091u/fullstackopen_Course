@@ -17,11 +17,10 @@ const AnecdoteForm = () => {
       if (
         error.response &&
         error.response.status === 400 
-        // && error.response.data.includes("at least 5 characters long")
       ) {
         dispatch({
           type: "ERROR",
-          message: "Anecdote content must be at least 5 characters long.",
+          // message: "Anecdote content must be at least 5 characters long.",
         });
       }
     },
