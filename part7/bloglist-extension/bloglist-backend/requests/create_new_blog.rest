@@ -1,0 +1,10 @@
+POST http://localhost:3003/api/blogs/
+Content-Type: application/json
+Authorization: Bearer 
+
+{
+    "title": "Reflections of a woman entering Tech",
+    "author": "Madhushree Boyle",
+    "url": "https://medium.com/@madhushree.b/reflections-of-a-woman-entering-tech",
+    "likes": 11
+}
