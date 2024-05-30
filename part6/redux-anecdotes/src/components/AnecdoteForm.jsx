@@ -12,10 +12,6 @@ const newAnecdote = () => {
 
     dispatch(createAnecdote(content));
     dispatch(setNotificationWithDuration(`You added note: "${content}"`, 5));
-    // dispatch(setNotification({ message: "New note added!" }));
-    // setTimeout(() => {
-    //   dispatch(removeNotification()); 
-    // }, 5000);
   };
 
   return (
