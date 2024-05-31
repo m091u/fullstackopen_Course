@@ -11,11 +11,11 @@ import { setNotificationWithDuration } from "./reducers/notificationReducer";
 import { initializeBlogs, createBlog } from "./reducers/blogsReducer";
 import { login, logout } from "./reducers/userReducer";
 import { selectUser } from "./reducers/userReducer";
+import LoginForm from "./components/LoginForm";
 
 const App = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  // const [user, setUser] = useState(null);
 
   const dispatch = useDispatch();
   const blogs = useSelector((state) => state.blogs);
@@ -26,10 +26,11 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
-      setUser(user);
+
       blogService.setToken(user.token);
+      dispatch(login(user));
     }
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(initializeBlogs());
@@ -42,13 +43,12 @@ const App = () => {
         username,
         password,
       });
-      console.log(user);
 
       window.localStorage.setItem("loggedBlogAppUser", JSON.stringify(user));
       blogService.setToken(user.token);
-      // setUser(user);
+
       dispatch(login(user));
-      console.log(user);
+
       setUsername("");
       setPassword("");
     } catch (exception) {
@@ -105,34 +105,12 @@ const App = () => {
         <div>
           <h2>Log in to application</h2>
           <Notification />
-
-          <form onSubmit={handleLogin}>
-            <div>
-              username
-              <input
-                type="text"
-                data-testid="username"
-                id="username"
-                value={username}
-                name="Username"
-                onChange={({ target }) => setUsername(target.value)}
-              />
-            </div>
-            <div>
-              password
-              <input
-                type="text"
-                id="password"
-                data-testid="password"
-                value={password}
-                name="Password"
-                onChange={({ target }) => setPassword(target.value)}
-              />
-            </div>
-            <button type="submit" id="login-button">
-              Login
-            </button>
-          </form>
+          <LoginForm
+            handleLogin={handleLogin}
+            username={username}
+            setUsername={setUsername}
+            password={password}
+            setPassword={setPassword} />
         </div>
       ) : (
         <div>
