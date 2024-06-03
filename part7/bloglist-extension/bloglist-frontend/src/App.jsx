@@ -1,17 +1,21 @@
 import { useState, useEffect, useRef } from "react";
+import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
 import "./App.css";
-import Blog from "./components/Blog";
-import blogService from "./services/blogs";
-import loginService from "./services/login";
+import BlogDetails from "./components/BlogDetails";
+import BlogList from "./components/BlogList";
+import Users from "./components/Users";
 import Notification from "./components/Notification";
 import BlogForm from "./components/BlogForm";
 import Togglable from "./components/Togglable";
+import blogService from "./services/blogs";
+import loginService from "./services/login";
 import { useDispatch, useSelector } from "react-redux";
 import { setNotificationWithDuration } from "./reducers/notificationReducer";
 import { initializeBlogs, createBlog } from "./reducers/blogsReducer";
 import { login, logout } from "./reducers/userReducer";
 import { selectUser } from "./reducers/userReducer";
 import LoginForm from "./components/LoginForm";
+import UserDetails from "./components/UserDetails";
 
 const App = () => {
   const [username, setUsername] = useState("");
@@ -101,40 +105,50 @@ const App = () => {
 
   return (
     <>
-      {user === null ? (
-        <div>
-          <h2>Log in to application</h2>
-          <Notification />
-          <LoginForm
-            handleLogin={handleLogin}
-            username={username}
-            setUsername={setUsername}
-            password={password}
-            setPassword={setPassword} />
-        </div>
-      ) : (
-        <div>
-          <Notification />
-          <h2>Blogs</h2>
-          <p>{user.name} is logged-in</p>
-          <button onClick={handleLogout}>Logout</button>
-          <hr />
-          <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
-            <BlogForm createBlog={addBlog} />
-          </Togglable>
-          <hr />
+      <Router>
+        {user === null ? (
           <div>
-            {blogs.map((blog) => (
-              <Blog
-                key={blog.id}
-                blog={blog}
-                loggedInUser={user}
-                handleDelete={handleDelete}
-              />
-            ))}
+            <h2>Log in to application</h2>
+            <Notification />
+            <LoginForm
+              handleLogin={handleLogin}
+              username={username}
+              setUsername={setUsername}
+              password={password}
+              setPassword={setPassword}
+            />
           </div>
-        </div>
-      )}
+        ) : (
+          <div>
+            <Notification />
+
+            <h2>Blogs</h2>
+
+            <p>{user.name} is logged-in</p>
+            <button onClick={handleLogout}>Logout</button>
+            <hr />
+            <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
+              <BlogForm createBlog={addBlog} />
+            </Togglable>
+            <hr />
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <BlogList
+                    blogs={blogs}
+                    loggedInUser={user}
+                    handleDelete={handleDelete}
+                  />
+                }
+              />
+              <Route path="/blogs/:id" element={<BlogDetails loggedInUser={user} handleDelete={handleDelete}/>} />
+              <Route path="/users" element={<Users />} />
+              <Route path="/users/:id" element={<UserDetails />} />
+            </Routes>
+          </div>
+        )}
+      </Router>
     </>
   );
 };
