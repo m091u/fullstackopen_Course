@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Table, Form, Button, Alert ,Navbar, Nav} from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getUsers } from "../reducers/usersReducer";
@@ -14,24 +15,24 @@ const Users = () => {
   return (
     <div>
       <h2>Users</h2>
-      <table>
+      <Table striped>
         <thead>
           <tr>
-            <th>Username</th>
-            <th>Blog Count</th>
+            <th style={{ textAlign: "center" }}>Username</th>
+            <th style={{ textAlign: "center" }}>Blog Count</th>
           </tr>
         </thead>
         <tbody>
           {users.map((user) => (
             <tr key={user.id}>
-              <td>
+              <td style={{ textAlign: "center" }}>
                 <Link to={`/users/${user.id}`}>{user.username}</Link>
               </td>
-              <td>{user.blogs.length}</td>
+              <td style={{ textAlign: "center" }}>{user.blogs.length}</td>
             </tr>
           ))}
         </tbody>
-      </table>
+      </Table>
     </div>
   );
 };

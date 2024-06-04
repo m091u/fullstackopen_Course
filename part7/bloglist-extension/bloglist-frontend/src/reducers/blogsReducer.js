@@ -40,14 +40,28 @@ export const createBlog = (content) => {
   };
 };
 
-export const updateLikes = (blog) => {
-  return async (dispatch) => {
+// export const updateLikes = (blog) => {
+//   return async (dispatch) => {
+//     try {
+//       const updatedBlog = await blogService.update(blog.id, {
+//         ...blog,
+//         likes: blog.likes + 1,
+//       });
+//       const updatedBlogWithUser = { ...updatedBlog, user: blog.user };
+//       dispatch(updateBlog(updatedBlogWithUser));
+//     } catch (error) {
+//       console.error("Error updating likes:", error);
+//     }
+//   };
+// };
+
+export const updateLikes = blog => {
+  return async dispatch => {
     const updatedBlog = await blogService.update(blog.id, {
       ...blog,
-      likes: blog.likes + 1,
+      likes: blog.likes + 1
     });
-    const updatedBlogWithUser = { ...updatedBlog, user: blog.user };
-    dispatch(updateBlog(updatedBlogWithUser));
+    dispatch(updateBlog(updatedBlog));
   };
 };
 

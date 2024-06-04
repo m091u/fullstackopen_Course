@@ -13,6 +13,11 @@ const getAll = async () => {
   return response.data;
 };
 
+const getBlogById = async (id) => {
+  const response = await axios.get(`/api/blogs/${id}`);
+  return response.data;
+};
+
 const create = async (newObject) => {
   const config = {
     headers: { Authorization: token },
@@ -22,18 +27,17 @@ const create = async (newObject) => {
   return response.data;
 };
 
-const getUserById = async (userId) => {
-  const response = await axios.get(`/api/users/${userId}`);
-  console.log("user details", response.data);
-  return response.data;
-};
-
 const update = async (id, newObject) => {
   const config = {
     headers: { Authorization: token },
   };
 
+  console.log(`Sending PUT request to ${baseUrl}/${id} with data:`, newObject);
+
   const response = await axios.put(`${baseUrl}/${id}`, newObject, config);
+
+  console.log("Response from server:", response.data);
+
   return response.data;
 };
 
@@ -51,4 +55,4 @@ const remove = async (id) => {
   }
 };
 
-export default { getAll, create, update, setToken, getUserById, remove };
+export default { getAll, getBlogById, create, update, setToken, remove };

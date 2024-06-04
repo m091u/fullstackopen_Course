@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom";
+import { Navbar, Nav } from "react-bootstrap";
 import "./App.css";
 import BlogDetails from "./components/BlogDetails";
 import BlogList from "./components/BlogList";
@@ -103,9 +104,41 @@ const App = () => {
     }
   };
 
+  const padding = {
+    padding: 5,
+  };
+
   return (
     <>
-      <Router>
+      {user && (
+        <Navbar collapseOnSelect expand="sm" bg="dark" variant="dark">
+          <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+          <Navbar.Collapse id="responsive-navbar-nav">
+            <Nav className="me-auto">
+              <Nav.Link href="#" as="span">
+                <Link style={padding} to="/">
+                  blogs
+                </Link>
+              </Nav.Link>
+              <Nav.Link href="#" as="span">
+                <Link style={padding} to="/users">
+                  users
+                </Link>
+              </Nav.Link>
+              <Nav.Link href="#" as="span">
+                <em style={padding}>{user.name} is logged in</em>
+              </Nav.Link>
+              <Nav.Link href="#" as="span">
+                <button style={padding} onClick={handleLogout}>
+                  Logout
+                </button>
+              </Nav.Link>
+            </Nav>
+          </Navbar.Collapse>
+        </Navbar>
+      )}
+
+      <div>
         {user === null ? (
           <div>
             <h2>Log in to application</h2>
@@ -122,10 +155,7 @@ const App = () => {
           <div>
             <Notification />
 
-            <h2>Blogs</h2>
-
-            <p>{user.name} is logged-in</p>
-            <button onClick={handleLogout}>Logout</button>
+            <h2>Blog App</h2>
             <hr />
             <Togglable buttonLabel="Create new blog" ref={blogFormRef}>
               <BlogForm createBlog={addBlog} />
@@ -142,13 +172,21 @@ const App = () => {
                   />
                 }
               />
-              <Route path="/blogs/:id" element={<BlogDetails loggedInUser={user} handleDelete={handleDelete}/>} />
+              <Route
+                path="/blogs/:id"
+                element={
+                  <BlogDetails
+                    loggedInUser={user}
+                    handleDelete={handleDelete}
+                  />
+                }
+              />
               <Route path="/users" element={<Users />} />
               <Route path="/users/:id" element={<UserDetails />} />
             </Routes>
           </div>
         )}
-      </Router>
+      </div>
     </>
   );
 };

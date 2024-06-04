@@ -11,6 +11,17 @@ blogsRouter.get("/", async (request, response) => {
   response.json(blogs);
 });
 
+blogsRouter.get("/:id", async (request, response)=> {
+  const blog = await Blog.findById(request.params.id).populate("user", { username: 1, name: 1 });
+
+  if (blog) {
+    response.json(blog);
+    console.log(blog);
+  } else {
+    response.status(404).end();
+  }
+})
+
 blogsRouter.post("/", async (request, response) => {
   const body = request.body;
   const user = request.user;
@@ -29,7 +40,7 @@ blogsRouter.post("/", async (request, response) => {
 
   const blog = new Blog({
     ...request.body,
-    user: currentUser,
+    user: currentUser,   
   });
 
     const savedBlog = await blog.save();
@@ -42,32 +53,33 @@ blogsRouter.post("/", async (request, response) => {
   response.status(201).json(savedBlog);
 });
 
-blogsRouter.put("/:id", async (request, response) => {
-  const { title, likes, author, url } = request.body;
-  const updatedBlog = await Blog.findByIdAndUpdate(
-    request.params.id,
-    { title, likes, author, url },
-    { new: true }
-  );
 
-  response.json(updatedBlog);
-});
+blogsRouter.put("/:id", async (request, response, next) => {
+  const { id } = request.params;
+  const updatedBlogData = request.body;
 
-//increase likes
-blogsRouter.put("/:id", async (request, response) => {
-  const { id } = req.params;
-  const updatedBlogData = req.body;
+  console.log(`Received PUT request for blog ID: ${id}`);
+  console.log('Updated blog data:', updatedBlogData);
 
-  const updatedBlog = await Blog.findByIdAndUpdate(id, updatedBlogData, {
-    new: true,
-  });
+  const blog = await Blog.findById(id);
+  if (!blog) {
+    return response.status(404).json({ error: "Blog not found" });
+  }
+  blog.likes = updatedBlogData.likes;
+  console.log(`Updating likes to: ${updatedBlogData.likes}`);
+  const updatedBlog = await blog.save();
+  await updatedBlog.populate("user", { username: 1, name: 1 });
+
+  // const updatedBlog = await Blog.findByIdAndUpdate(id, updatedBlogData, { new: true }).populate("user", { username: 1, name: 1 });
 
   if (!updatedBlog) {
     return next(new Error("UpdateLikesError"));
   }
-
+  console.log('Updated blog:', updatedBlog);
+  
   response.json(updatedBlog);
 });
+
 
 blogsRouter.delete("/:id", async (request, response) => {
   const decodedToken = jwt.verify(request.token, process.env.SECRET);
