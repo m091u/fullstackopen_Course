@@ -63,6 +63,17 @@ const BlogDetails = ({ loggedInUser, handleDelete }) => {
           Remove
         </button>
       )}
+
+      <h3>Comments</h3>
+
+      <form >
+        <input
+     
+          placeholder='write comment here'
+          id='comment-input'
+        />
+        <button type="submit">add comment</button>
+      </form>
     </div>
   );
 };
