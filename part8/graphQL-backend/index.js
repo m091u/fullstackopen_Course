@@ -4,8 +4,7 @@ const { v1: uuid } = require("uuid");
 
 const mongoose = require("mongoose");
 const { GraphQLError } = require("graphql");
-const jwt = require('jsonwebtoken')
-
+const jwt = require("jsonwebtoken");
 
 mongoose.set("strictQuery", false);
 
@@ -20,9 +19,10 @@ const MONGODB_URI = process.env.MONGODB_URI;
 
 mongoose
   .connect(MONGODB_URI)
-  .then(() => {
+  .then(async () => {
     console.log("connected to MongoDB");
   })
+
   .catch((error) => {
     console.log("error connection to MongoDB:", error.message);
   });
@@ -189,7 +189,6 @@ const resolvers = {
   },
   Mutation: {
     addBook: async (root, args, context) => {
-
       if (!context.currentUser) {
         throw new GraphQLError("Not authenticated", {
           extensions: {
@@ -219,7 +218,6 @@ const resolvers = {
       }
     },
     editAuthor: async (root, args, context) => {
-
       if (!context.currentUser) {
         throw new GraphQLError("Not authenticated", {
           extensions: {
@@ -231,11 +229,19 @@ const resolvers = {
       try {
         const author = await Author.findOne({ name: args.name });
         if (!author) {
-          return null;
+          // return null;
+          throw new UserInputError("Author not found");
         }
 
-        author.born = args.setBornTo;
+        // author.born = args.setBornTo;
+        if (isNaN(args.setBornTo)) {
+          throw new UserInputError("Invalid birth year provided");
+        }
+
+        author.born = parseInt(args.setBornTo);
         await author.save();
+        console.log("Author updated:", author);
+
         return author;
       } catch (error) {
         throw new GraphQLError(error.message, {
@@ -247,7 +253,10 @@ const resolvers = {
       }
     },
     createUser: async (root, args) => {
-      const user = new User({ username: args.username, favoriteGenre: args.favoriteGenre})
+      const user = new User({
+        username: args.username,
+        favoriteGenre: args.favoriteGenre,
+      });
 
       return user.save().catch((error) => {
         throw new GraphQLError("Creating user failed", {
@@ -274,7 +283,7 @@ const resolvers = {
         id: user._id,
       };
 
-      return { value: jwt.sign(userForToken, process.env.JWT_SECRET) }
+      return { value: jwt.sign(userForToken, process.env.JWT_SECRET) };
     },
   },
 };
@@ -287,14 +296,14 @@ const server = new ApolloServer({
 startStandaloneServer(server, {
   listen: { port: 4000 },
   context: async ({ req, res }) => {
-    const auth = req ? req.headers.authorization : null
-    if (auth && auth.startsWith('Bearer ')) {
+    const auth = req ? req.headers.authorization : null;
+    if (auth && auth.startsWith("Bearer ")) {
       const decodedToken = jwt.verify(
-        auth.substring(7), process.env.JWT_SECRET
-      )
-      const currentUser = await User
-        .findById(decodedToken.id).populate('friends')
-      return { currentUser }
+        auth.substring(7),
+        process.env.JWT_SECRET
+      );
+      const currentUser = await User.findById(decodedToken.id);
+      return { currentUser };
     }
   },
 }).then(({ url }) => {
